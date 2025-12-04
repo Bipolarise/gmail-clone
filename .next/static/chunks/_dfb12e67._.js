@@ -25,14 +25,14 @@ const LABELS = [
         name: "Sent"
     },
     {
-        id: "DRAFT",
+        id: "DRAFTS",
         name: "Drafts"
     }
 ];
 function MailSidebar(param) {
     let { activeLabel, unreadInboxCount, onLabelChange } = param;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
-        className: "flex w-60 flex-col border-r border-slate-200 bg-[#f6f8fc]",
+        className: "flex w-60 flex-col bg-[#f6f8fc]",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "px-3 pt-3 pb-2",
@@ -68,7 +68,7 @@ function MailSidebar(param) {
                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         type: "button",
                         onClick: ()=>onLabelChange(item.id),
-                        className: "flex items-center justify-between rounded-r-full px-4 py-2 text-left hover:bg-slate-200 ".concat(isActive ? "bg-slate-200 font-medium" : ""),
+                        className: "flex items-center justify-between rounded-r-full px-4 py-2 text-left hover:bg-[#e8eaed] ".concat(isActive ? "bg-[#d3e3fd] font-medium text-[#0b57d0]" : ""),
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: item.name
@@ -125,10 +125,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$ne
 function MailList(param) {
     let { emails, selectedId, onSelect } = param;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "flex min-w-[380px] flex-1 flex-col border-r border-slate-200 bg-white",
+        className: "flex flex-1 flex-col rounded-2xl bg-white shadow-[0_1px_3px_rgba(60,64,67,0.2)] overflow-hidden",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex h-11 items-end border-b border-slate-200 px-4 text-xs font-medium text-slate-600",
+                className: "flex h-12 items-end border-b border-[#e0e3e7] px-4 text-xs font-medium text-slate-600",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         className: "border-b-2 border-[#1a73e8] px-3 pb-2 text-[#1a73e8]",
@@ -169,7 +169,7 @@ function MailList(param) {
                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
                             onClick: ()=>onSelect(mail.id),
-                            className: "flex w-full items-center gap-3 border-b border-slate-100 px-4 py-2 hover:bg-[#f2f6fc] ".concat(isSelected ? "bg-[#e8f0fe]" : ""),
+                            className: "flex w-full items-center gap-3 border-b border-[#e0e3e7] px-4 py-2 hover:bg-[#f2f6fc] ".concat(isSelected ? "bg-[#e8f0fe]" : ""),
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "w-48 shrink-0 truncate text-left",
@@ -269,126 +269,153 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$ne
 "use client";
 ;
 function MailDetail(param) {
-    let { email } = param;
+    let { email, onBack } = param;
     if (!email) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-            className: "hidden flex-1 items-center justify-center bg-white text-sm text-slate-500 lg:flex",
+            className: "flex flex-1 items-center justify-center rounded-2xl bg-white shadow-[0_1px_3px_rgba(60,64,67,0.2)] text-sm text-slate-500",
             children: "Select a conversation to read"
         }, void 0, false, {
             fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-            lineNumber: 12,
+            lineNumber: 13,
             columnNumber: 7
         }, this);
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "hidden flex-1 flex-col bg-white lg:flex",
+        className: "flex flex-1 flex-col rounded-2xl bg-white shadow-[0_1px_3px_rgba(60,64,67,0.2)] overflow-hidden",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "border-b border-slate-200 px-6 py-3",
+                className: "flex items-start justify-between border-b border-[#e0e3e7] px-6 py-3",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mb-1 text-sm font-semibold text-slate-900",
-                        children: email.subject
-                    }, void 0, false, {
-                        fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                        lineNumber: 22,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center justify-between text-xs text-slate-500",
+                        className: "flex items-center gap-3",
                         children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                onClick: onBack,
+                                className: "mr-1 rounded-full p-1.5 text-slate-600 hover:bg-[#f1f3f4]",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-lg",
+                                    children: "←"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/features/mail/components/MailDetail.tsx",
+                                    lineNumber: 30,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/features/mail/components/MailDetail.tsx",
+                                lineNumber: 25,
+                                columnNumber: 11
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "font-medium text-slate-700",
-                                        children: email.from
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-1 text-sm font-semibold text-slate-900",
+                                        children: email.subject
                                     }, void 0, false, {
                                         fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                                        lineNumber: 27,
+                                        lineNumber: 34,
                                         columnNumber: 13
                                     }, this),
-                                    email.fromEmail && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-xs text-slate-500",
                                         children: [
-                                            " <",
-                                            email.fromEmail,
-                                            ">"
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-medium text-slate-700",
+                                                children: email.from
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/features/mail/components/MailDetail.tsx",
+                                                lineNumber: 38,
+                                                columnNumber: 15
+                                            }, this),
+                                            email.fromEmail && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: [
+                                                    " <",
+                                                    email.fromEmail,
+                                                    ">"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/features/mail/components/MailDetail.tsx",
+                                                lineNumber: 39,
+                                                columnNumber: 35
+                                            }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                                        lineNumber: 28,
-                                        columnNumber: 33
+                                        lineNumber: 37,
+                                        columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                                lineNumber: 26,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                children: email.receivedAtFull
-                            }, void 0, false, {
-                                fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                                lineNumber: 30,
+                                lineNumber: 33,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                        lineNumber: 25,
+                        lineNumber: 23,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "mt-1 text-xs text-slate-500",
+                        children: email.receivedAtFull
+                    }, void 0, false, {
+                        fileName: "[project]/src/features/mail/components/MailDetail.tsx",
+                        lineNumber: 44,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                lineNumber: 21,
+                lineNumber: 22,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex-1 overflow-y-auto px-6 py-4 text-sm leading-relaxed text-slate-800 whitespace-pre-line",
+                className: "flex-1 overflow-y-auto whitespace-pre-line px-6 py-4 text-sm leading-relaxed text-slate-800",
                 children: email.body
             }, void 0, false, {
                 fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                lineNumber: 35,
+                lineNumber: 50,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "border-t border-slate-200 px-6 py-3",
+                className: "border-t border-[#e0e3e7] px-6 py-3",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex gap-2",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            className: "rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100",
+                            className: "rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-[#f1f3f4]",
                             children: "Reply"
                         }, void 0, false, {
                             fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                            lineNumber: 42,
+                            lineNumber: 57,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            className: "rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100",
+                            className: "rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-[#f1f3f4]",
                             children: "Forward"
                         }, void 0, false, {
                             fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                            lineNumber: 48,
+                            lineNumber: 63,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                    lineNumber: 41,
+                    lineNumber: 56,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-                lineNumber: 40,
+                lineNumber: 55,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/features/mail/components/MailDetail.tsx",
-        lineNumber: 19,
+        lineNumber: 20,
         columnNumber: 5
     }, this);
 }
@@ -411,43 +438,42 @@ __turbopack_context__.s({
 const MOCK_MAIL_ITEMS = [
     {
         id: "1",
-        from: "Lyra Hiring <careers@lyra.com>",
+        label: "INBOX",
+        from: "Lyra Hiring",
+        fromEmail: "careers@lyra.com",
         subject: "Gmail task – next steps & expectations",
         snippet: "Hi Jonathan, thanks again for taking the time to complete the task...",
-        date: "10:24 AM",
-        label: "INBOX",
-        unread: true,
-        body: "\nHey Jonathan,\n\nThanks again for taking the time to work on the Gmail task.\nWe're excited to see what you build!\n\nBest,\nLyra Hiring Team\n"
+        body: "Hey Jonathan,\n\nThanks again for taking the time to work on the Gmail task.\nWe're excited to see what you build!\n\nBest,\nLyra Hiring Team",
+        receivedAt: new Date("2025-12-04T10:24:00"),
+        receivedAtTime: "10:24 AM",
+        receivedAtFull: "Dec 4, 2025, 10:24 AM",
+        unread: false
     },
     {
         id: "2",
-        from: "Google <no-reply@google.com>",
+        label: "INBOX",
+        from: "Google",
+        fromEmail: "no-reply@google.com",
         subject: "Security alert – new sign-in from Chrome on macOS",
         snippet: "We noticed a new sign-in to your Google Account on a Mac device...",
-        date: "9:03 AM",
-        label: "INBOX",
-        unread: false,
-        body: "\nHi Jonathan,\n\nWe noticed a new sign-in to your Google Account from Chrome on macOS.\n\nIf this was you, you can ignore this message.\n\nThanks,\nGoogle Account Security\n"
+        body: "Hi Jonathan,\n\nWe noticed a new sign-in to your Google Account from Chrome on macOS.\n\nIf this was you, you can ignore this email.\n\nThanks,\nGoogle Account Security",
+        receivedAt: new Date("2025-12-04T09:03:00"),
+        receivedAtTime: "9:03 AM",
+        receivedAtFull: "Dec 4, 2025, 9:03 AM",
+        unread: true
     },
     {
         id: "3",
-        from: "UNSW <no-reply@unsw.edu.au>",
-        subject: "COMP3311 – Assignment 2 results released",
-        snippet: "Your marks for Assignment 2 are now available in WebCMS3...",
-        date: "Yesterday",
-        label: "STARRED",
-        unread: false,
-        body: "\nHi Jonathan,\n\nYour COMP3311 Assignment 2 results have been released.\nYou can view them on WebCMS3.\n\nRegards,\nCOMP3311 Teaching Team\n"
-    },
-    {
-        id: "4",
-        from: "You <jonathan@example.com>",
-        subject: "Re: Christmas plans",
-        snippet: "Yeah we can definitely go into the city and check out the lights...",
-        date: "Mon",
-        label: "SENT",
-        unread: false,
-        body: "\nHey,\n\nYeah we can definitely go into the city and check out the lights.\nLet's lock in a time closer to the date.\n\n– Jonathan\n"
+        label: "DRAFTS",
+        from: "Jonathan Liu",
+        fromEmail: "jonathanliu023@gmail.com",
+        subject: "(Draft) Reply to Lyra",
+        snippet: "Hi Lyra team, thanks again for the opportunity...",
+        body: "Hi Lyra team,\n\nThanks again for the opportunity. Here's some more detail on my approach...\n\nBest,\nJonathan",
+        receivedAt: new Date("2025-12-03T21:15:00"),
+        receivedAtTime: "9:15 PM",
+        receivedAtFull: "Dec 3, 2025, 9:15 PM",
+        unread: false
     }
 ];
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
@@ -478,12 +504,13 @@ var _s = __turbopack_context__.k.signature();
 ;
 function MailApp(param) {
     let { session } = param;
-    var _MOCK_MAIL_ITEMS_, _session_user, _session_user1;
+    var _session_user, _session_user1;
     _s();
     const [activeLabel, setActiveLabel] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("INBOX");
-    var _MOCK_MAIL_ITEMS__id;
-    const [selectedId, setSelectedId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])((_MOCK_MAIL_ITEMS__id = (_MOCK_MAIL_ITEMS_ = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$types$2f$mail$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MOCK_MAIL_ITEMS"][0]) === null || _MOCK_MAIL_ITEMS_ === void 0 ? void 0 : _MOCK_MAIL_ITEMS_.id) !== null && _MOCK_MAIL_ITEMS__id !== void 0 ? _MOCK_MAIL_ITEMS__id : null);
+    const [selectedId, setSelectedId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [search, setSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [viewMode, setViewMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("list");
+    const [isSidebarOpen, setIsSidebarOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true); // NEW
     const filteredEmails = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "MailApp.useMemo[filteredEmails]": ()=>{
             return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$types$2f$mail$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MOCK_MAIL_ITEMS"].filter({
@@ -500,19 +527,19 @@ function MailApp(param) {
         activeLabel,
         search
     ]);
-    var _filteredEmails_find, _ref;
-    const selectedMail = (_ref = (_filteredEmails_find = filteredEmails.find((m)=>m.id === selectedId)) !== null && _filteredEmails_find !== void 0 ? _filteredEmails_find : filteredEmails[0]) !== null && _ref !== void 0 ? _ref : null;
+    var _filteredEmails_find;
+    const selectedMail = (_filteredEmails_find = filteredEmails.find((m)=>m.id === selectedId)) !== null && _filteredEmails_find !== void 0 ? _filteredEmails_find : null;
     const unreadInboxCount = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "MailApp.useMemo[unreadInboxCount]": ()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$types$2f$mail$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MOCK_MAIL_ITEMS"].filter({
                 "MailApp.useMemo[unreadInboxCount]": (m)=>m.label === "INBOX" && m.unread
             }["MailApp.useMemo[unreadInboxCount]"]).length
     }["MailApp.useMemo[unreadInboxCount]"], []);
-    var _session_user_email, _ref1;
+    var _session_user_email, _ref;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex h-screen flex-col bg-[#f6f8fc] text-slate-900",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                className: "flex h-14 items-center gap-4 border-b border-slate-200 bg-white px-4",
+                className: "flex h-14 items-center gap-4 bg-[#f6f8fc] px-4",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex items-center gap-2",
@@ -522,7 +549,7 @@ function MailApp(param) {
                                 children: "M"
                             }, void 0, false, {
                                 fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                                lineNumber: 59,
+                                lineNumber: 61,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -530,13 +557,13 @@ function MailApp(param) {
                                 children: "Mail"
                             }, void 0, false, {
                                 fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                                lineNumber: 62,
+                                lineNumber: 64,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                        lineNumber: 58,
+                        lineNumber: 60,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -549,7 +576,7 @@ function MailApp(param) {
                                     children: "🔍"
                                 }, void 0, false, {
                                     fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                                    lineNumber: 68,
+                                    lineNumber: 70,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -559,29 +586,29 @@ function MailApp(param) {
                                     className: "w-full bg-transparent text-sm outline-none placeholder:text-slate-500"
                                 }, void 0, false, {
                                     fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                                    lineNumber: 69,
+                                    lineNumber: 71,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                            lineNumber: 67,
+                            lineNumber: 69,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                        lineNumber: 66,
+                        lineNumber: 68,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex items-center gap-3",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "hidden text-xs text-slate-600 sm:inline-block max-w-[180px] truncate",
-                                children: (_ref1 = (_session_user_email = (_session_user = session.user) === null || _session_user === void 0 ? void 0 : _session_user.email) !== null && _session_user_email !== void 0 ? _session_user_email : (_session_user1 = session.user) === null || _session_user1 === void 0 ? void 0 : _session_user1.name) !== null && _ref1 !== void 0 ? _ref1 : "Signed in"
+                                className: "hidden max-w-[180px] truncate text-xs text-slate-600 sm:inline-block",
+                                children: (_ref = (_session_user_email = (_session_user = session.user) === null || _session_user === void 0 ? void 0 : _session_user.email) !== null && _session_user_email !== void 0 ? _session_user_email : (_session_user1 = session.user) === null || _session_user1 === void 0 ? void 0 : _session_user1.name) !== null && _ref !== void 0 ? _ref : "Signed in"
                             }, void 0, false, {
                                 fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                                lineNumber: 80,
+                                lineNumber: 82,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -590,63 +617,123 @@ function MailApp(param) {
                                 children: "Sign out"
                             }, void 0, false, {
                                 fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                                lineNumber: 83,
+                                lineNumber: 85,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                        lineNumber: 79,
+                        lineNumber: 81,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                lineNumber: 56,
+                lineNumber: 58,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex flex-1 overflow-hidden",
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$components$2f$MailSidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MailSidebar"], {
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex h-full w-14 flex-col items-center bg-[#f6f8fc] pt-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                onClick: ()=>setIsSidebarOpen((prev)=>!prev),
+                                className: "mb-4 rounded-full p-2 text-slate-600 hover:bg-[#e8eaed]",
+                                "aria-label": "Toggle sidebar",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "block text-xl leading-none",
+                                    children: "☰"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                                    lineNumber: 106,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                                lineNumber: 99,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                className: "mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-[#c2e7ff] text-sm font-medium text-[#0b57d0] shadow-sm",
+                                children: "M"
+                            }, void 0, false, {
+                                fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                                lineNumber: 110,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-4 flex flex-1 flex-col items-center gap-3 text-xs text-slate-500"
+                            }, void 0, false, {
+                                fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                                lineNumber: 118,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                        lineNumber: 97,
+                        columnNumber: 9
+                    }, this),
+                    isSidebarOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$components$2f$MailSidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MailSidebar"], {
                         activeLabel: activeLabel,
                         unreadInboxCount: unreadInboxCount,
-                        onLabelChange: setActiveLabel
+                        onLabelChange: (label)=>{
+                            setActiveLabel(label);
+                            setViewMode("list");
+                            setSelectedId(null);
+                        }
                     }, void 0, false, {
                         fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                        lineNumber: 94,
-                        columnNumber: 9
+                        lineNumber: 125,
+                        columnNumber: 11
                     }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$components$2f$MailList$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MailList"], {
-                        emails: filteredEmails,
-                        selectedId: selectedId,
-                        onSelect: setSelectedId
-                    }, void 0, false, {
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex flex-1 overflow-hidden px-4 pt-3 pb-4",
+                        children: [
+                            viewMode === "list" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$components$2f$MailList$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MailList"], {
+                                emails: filteredEmails,
+                                selectedId: selectedId,
+                                onSelect: (id)=>{
+                                    setSelectedId(id);
+                                    setViewMode("detail");
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                                lineNumber: 139,
+                                columnNumber: 13
+                            }, this),
+                            viewMode === "detail" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$components$2f$MailDetail$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MailDetail"], {
+                                email: selectedMail,
+                                onBack: ()=>setViewMode("list")
+                            }, void 0, false, {
+                                fileName: "[project]/src/features/mail/components/MailApp.tsx",
+                                lineNumber: 150,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                        lineNumber: 100,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$15$2e$4$2e$2_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$features$2f$mail$2f$components$2f$MailDetail$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MailDetail"], {
-                        email: selectedMail
-                    }, void 0, false, {
-                        fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                        lineNumber: 106,
+                        lineNumber: 137,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/features/mail/components/MailApp.tsx",
-                lineNumber: 93,
+                lineNumber: 95,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/features/mail/components/MailApp.tsx",
-        lineNumber: 54,
+        lineNumber: 56,
         columnNumber: 5
     }, this);
 }
-_s(MailApp, "37GKQ1hTnx8Izvm2b7IEKOgk38o=");
+_s(MailApp, "iOmMccEHKqhhF0zSLWZ8hRfu9sI=");
 _c = MailApp;
 var _c;
 __turbopack_context__.k.register(_c, "MailApp");
