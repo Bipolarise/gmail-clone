@@ -18,7 +18,7 @@ export function HelloMessage() {
 
   return (
     <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[hsl(280,100%,70%)] to-[hsl(240,100%,70%)] px-4 py-2">
-      <div className="h-2 w-2 animate-pulse rounded-full bg-green-400"></div>
+      <div className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
       <p className="text-lg font-medium text-white">
         {hello ? hello.greeting : "Loading tRPC query..."}
       </p>
@@ -72,11 +72,12 @@ export function LatestPost() {
         <button
           type="submit"
           className="w-full rounded-lg bg-gradient-to-r from-[hsl(280,100%,70%)] to-[hsl(240,100%,70%)] px-6 py-3 font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
-          disabled={createMutation.isPending ?? !name.trim()}
+          // disable when pending OR input is empty
+          disabled={createMutation.isPending || !name.trim()}
         >
           {createMutation.isPending ? (
             <div className="flex items-center justify-center gap-2">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               Posting...
             </div>
           ) : (
@@ -91,7 +92,10 @@ export function LatestPost() {
 export function Posts() {
   const trpc = useTRPC();
 
-  const { data: posts } = useSuspenseQuery(trpc.post.all.queryOptions());
+  const { data } = useSuspenseQuery(trpc.post.all.queryOptions());
+
+  // Force a proper type instead of `never[] | undefined`
+  const posts: PostWithUser[] = (data ?? []) as PostWithUser[];
 
   if (posts.length === 0) {
     return (
@@ -122,7 +126,7 @@ export function Posts() {
                 {post.name}
               </p>
               <p className="mt-1 text-xs text-gray-400">
-                {post.createdAt.toLocaleDateString()}
+                {new Date(post.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -140,11 +144,10 @@ export function GetPost() {
   const trpc = useTRPC();
   const [id, setId] = useState("");
 
-  const {
-    data: post,
-    isEnabled,
-    isPending,
-  } = useQuery(trpc.post.getById.queryOptions({ id }, { enabled: !!id }));
+  const { data: post, isPending } = useQuery(
+    trpc.post.getById.queryOptions({ id }, { enabled: !!id })
+  );
+  const isEnabled = !!id;
 
   return (
     <div className="w-full max-w-md space-y-4">
