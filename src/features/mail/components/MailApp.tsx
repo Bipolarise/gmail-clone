@@ -1,15 +1,16 @@
+// src/features/mail/components/MailApp.tsx
 "use client";
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import type { Session } from "next-auth";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { MailSidebar } from "./MailSidebar";
 import { MailList } from "./MailList";
 import { MailDetail } from "./MailDetail";
 import { MailAppRail } from "./MailAppRail";
 import { type MailItem, type MailLabel } from "../types/mail";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "~/trpc/react";
 
 type MailAppProps = {
@@ -19,53 +20,122 @@ type MailAppProps = {
 type ViewMode = "list" | "detail";
 
 export function MailApp({ session }: MailAppProps) {
+  // --- 0) Figure out if we're on the client or during SSR/build ---
+  const isClient = typeof window !== "undefined";
+
+  const primaryIdentity =
+    session.user?.email ?? session.user?.name ?? "You";
+  const avatarInitial = primaryIdentity.charAt(0).toUpperCase();
+
+  /**
+   * SERVER / BUILD RENDER:
+   * We DO NOT call any React hooks that talk to tRPC / Gmail here.
+   * This avoids the "fetch failed" build error.
+   */
+  if (!isClient) {
+    return (
+      <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
+        <MailAppRail unreadInboxCount={0} onToggleSidebar={() => {}} />
+
+        <div className="flex flex-1 flex-col">
+          <header className="flex h-14 items-center bg-[#f6f8fc] px-4">
+            <div className="flex w-56 items-center">
+              <Image
+                src="/gmail.png"
+                alt="Gmail"
+                width={150}
+                height={50}
+                className="h-9 w-auto"
+                priority
+              />
+            </div>
+
+            <div className="flex flex-1">
+              <div className="flex w-full max-w-2xl items-center rounded-full bg-[#eaf1fb] px-4 py-2 text-sm text-slate-700 shadow-inner">
+                <span className="material-symbols-outlined mr-2 text-[18px] text-slate-500">
+                  search
+                </span>
+                <span className="text-xs text-slate-500">
+                  Loading your mail…
+                </span>
+              </div>
+            </div>
+
+            <div className="ml-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
+                {avatarInitial}
+              </div>
+            </div>
+          </header>
+
+          <div className="flex flex-1 items-center justify-center text-sm text-slate-500">
+            Preparing your inbox…
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * CLIENT RENDER:
+   * From here down we're safely in the browser, so it's OK to use hooks
+   * and call tRPC / Gmail.
+   */
+
+  const trpc = useTRPC();
+
   const [activeLabel, setActiveLabel] = useState<MailLabel>("INBOX");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const trpc = useTRPC();
-
-  // 1) Fetch Gmail threads from your tRPC router
-  const { data: threads } = useSuspenseQuery(
-    trpc.gmail.listThreads.queryOptions()
+  // 1) Fetch Gmail threads on the client
+  const { data: threads = [] } = useSuspenseQuery(
+    trpc.gmail.listThreads.queryOptions(undefined, {
+      enabled: !!session.user, // only if logged in
+      staleTime: 30_000,
+    }),
   );
 
-  // 2) Map raw Gmail threads → your MailItem type
+  // 2) Map raw threads -> MailItem[]
   const mailItems: MailItem[] = useMemo(
     () =>
-      (threads ?? []).map((t) => {
+      threads.map((t) => {
         const received = t.receivedAt ? new Date(t.receivedAt) : new Date();
-        const receivedAtTime = received.toLocaleTimeString([], {
+        const receivedAtTime = received.toLocaleTimeString("en-AU", {
           hour: "2-digit",
           minute: "2-digit",
         });
-        const receivedAtFull = received.toLocaleString();
+        const receivedAtFull = received.toLocaleString("en-AU");
 
+        // Try to split "Name <email@x.com>"
         const fromEmailMatch =
+          typeof t.from === "string" ? t.from.match(/<([^>]+)>/) : null;
+
+        const fromName =
           typeof t.from === "string"
-            ? t.from.match(/<([^>]+)>/)
-            : null;
+            ? (t.from.split("<")[0] ?? "").trim() || "Unknown sender"
+            : "Unknown sender";
 
         return {
           id: t.id,
           label: "INBOX", // everything in INBOX for now
-          from: t.from ?? "Unknown sender",
+          from: fromName,
           fromEmail: fromEmailMatch?.[1] ?? "",
-          subject: t.subject ?? "(no subject)",
-          snippet: t.snippet ?? "",
-          body: t.snippet ?? "", // placeholder until you load full HTML
+          subject: t.subject || "(no subject)",
+          snippet: t.snippet || "",
+          body: t.snippet || "", // placeholder until you fetch full HTML
           receivedAt: received,
           receivedAtTime,
           receivedAtFull,
-          unread: false, // set true later if you wire in Gmail's unread flag
-        };
+          unread: false, // can wire up Gmail's UNREAD flag later
+        } satisfies MailItem;
       }),
-    [threads]
+    [threads],
   );
 
-  // 3) Filtering now uses mailItems (real Gmail data)
+  // 3) Filtering & selection
   const filteredEmails = useMemo(() => {
     return mailItems.filter((mail) => {
       if (activeLabel === "INBOX" && mail.label !== "INBOX") return false;
@@ -85,19 +155,14 @@ export function MailApp({ session }: MailAppProps) {
   const selectedMail: MailItem | null =
     filteredEmails.find((m) => m.id === selectedId) ?? null;
 
-  // 4) Unread count based on mailItems instead of MOCK_MAIL_ITEMS
   const unreadInboxCount = useMemo(
     () =>
       mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
-    [mailItems]
+    [mailItems],
   );
 
-  const primaryIdentity =
-    session.user?.email ?? session.user?.name ?? "You";
-  const avatarInitial = primaryIdentity.charAt(0).toUpperCase();
-
+  // 4) UI (same as before)
   return (
-    // OUTER ROW: rail on the far left, everything else to the right
     <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
       {/* Left icon rail spanning full height */}
       <MailAppRail

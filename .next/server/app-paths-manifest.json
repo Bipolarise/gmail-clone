@@ -1,4 +1,6 @@
 {
-  "/(home)/page": "app/(home)/page.js",
-  "/api/trpc/[trpc]/route": "app/api/trpc/[trpc]/route.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/trpc/[trpc]/route": "app/api/trpc/[trpc]/route.js",
+  "/(home)/page": "app/(home)/page.js"
 }
