@@ -133,12 +133,11 @@ export const protectedProcedure = t.procedure
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
-    const protectedServices = injectProtectedServices();
     return next({
       ctx: {
-        ...protectedServices,
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
+        ...ctx,
+        session: ctx.session, // ← KEEP THE FULL SESSION INCLUDING TOKENS
       },
     });
   });
+
