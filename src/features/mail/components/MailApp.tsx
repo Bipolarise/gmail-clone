@@ -8,11 +8,9 @@ import { MailSidebar } from "./MailSidebar";
 import { MailList } from "./MailList";
 import { MailDetail } from "./MailDetail";
 import { MailAppRail } from "./MailAppRail";
-import {
-  MOCK_MAIL_ITEMS,
-  type MailItem,
-  type MailLabel,
-} from "../types/mail";
+import { type MailItem, type MailLabel } from "../types/mail";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useTRPC } from "~/trpc/react";
 
 type MailAppProps = {
   session: Session;
@@ -27,8 +25,49 @@ export function MailApp({ session }: MailAppProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  const trpc = useTRPC();
+
+  // 1) Fetch Gmail threads from your tRPC router
+  const { data: threads } = useSuspenseQuery(
+    trpc.gmail.listThreads.queryOptions()
+  );
+
+  // 2) Map raw Gmail threads → your MailItem type
+  const mailItems: MailItem[] = useMemo(
+    () =>
+      (threads ?? []).map((t) => {
+        const received = t.receivedAt ? new Date(t.receivedAt) : new Date();
+        const receivedAtTime = received.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const receivedAtFull = received.toLocaleString();
+
+        const fromEmailMatch =
+          typeof t.from === "string"
+            ? t.from.match(/<([^>]+)>/)
+            : null;
+
+        return {
+          id: t.id,
+          label: "INBOX", // everything in INBOX for now
+          from: t.from ?? "Unknown sender",
+          fromEmail: fromEmailMatch?.[1] ?? "",
+          subject: t.subject ?? "(no subject)",
+          snippet: t.snippet ?? "",
+          body: t.snippet ?? "", // placeholder until you load full HTML
+          receivedAt: received,
+          receivedAtTime,
+          receivedAtFull,
+          unread: false, // set true later if you wire in Gmail's unread flag
+        };
+      }),
+    [threads]
+  );
+
+  // 3) Filtering now uses mailItems (real Gmail data)
   const filteredEmails = useMemo(() => {
-    return MOCK_MAIL_ITEMS.filter((mail) => {
+    return mailItems.filter((mail) => {
       if (activeLabel === "INBOX" && mail.label !== "INBOX") return false;
       if (activeLabel !== "INBOX" && mail.label !== activeLabel) return false;
 
@@ -41,17 +80,16 @@ export function MailApp({ session }: MailAppProps) {
         mail.snippet.toLowerCase().includes(q)
       );
     });
-  }, [activeLabel, search]);
+  }, [activeLabel, search, mailItems]);
 
   const selectedMail: MailItem | null =
     filteredEmails.find((m) => m.id === selectedId) ?? null;
 
+  // 4) Unread count based on mailItems instead of MOCK_MAIL_ITEMS
   const unreadInboxCount = useMemo(
     () =>
-      MOCK_MAIL_ITEMS.filter(
-        (m) => m.label === "INBOX" && m.unread,
-      ).length,
-    [],
+      mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
+    [mailItems]
   );
 
   const primaryIdentity =

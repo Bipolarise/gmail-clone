@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { MailItem } from "../types/mail";
 
 type MailListProps = {
@@ -13,8 +13,14 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(() => new Set());
   const [starredIds, setStarredIds] = useState<Set<string>>(() => new Set());
 
+  // Make first render (SSR + initial client) deterministic
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const toggleChecked = (id: string) => {
-    setCheckedIds(prev => {
+    setCheckedIds((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
@@ -22,13 +28,104 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
   };
 
   const toggleStarred = (id: string) => {
-    setStarredIds(prev => {
+    setStarredIds((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
 
+  // 🔹 On the very first render, don't use `emails` at all.
+  // This makes SSR HTML == initial client HTML, so no hydration mismatch.
+  if (!hasMounted) {
+    return (
+      <section className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white pt-2 shadow-[0_1px_3px_rgba(60,64,67,0.2)]">
+        {/* Toolbar row above tabs */}
+        <div className="flex h-8 items-center justify-between px-4 text-[11px] text-slate-600">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              className="flex h-7 w-7 items-center justify-center rounded-md bg-transparent hover:bg-[#f1f3f4]"
+              aria-label="Select"
+            >
+              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
+                check_box_outline_blank
+              </span>
+            </button>
+            <button
+              type="button"
+              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+              aria-label="Refresh"
+            >
+              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
+                refresh
+              </span>
+            </button>
+            <button
+              type="button"
+              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+              aria-label="More"
+            >
+              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
+                more_vert
+              </span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1 text-[12px]">
+            <span>Loading…</span>
+            <button
+              type="button"
+              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+              aria-label="Previous page"
+            >
+              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
+                chevron_left
+              </span>
+            </button>
+            <button
+              type="button"
+              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+              aria-label="Next page"
+            >
+              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
+                chevron_right
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs row */}
+        <div className="flex h-14 items-end border-b border-[#e0e3e7] px-4 text-sm font-medium text-slate-600">
+          <button className="flex min-w-[200px] items-center gap-2 border-b-2 border-[#1a73e8] px-6 pb-3 text-[#1a73e8]">
+            <span className="material-symbols-outlined text-[18px] leading-none">
+              inbox
+            </span>
+            <span>Primary</span>
+          </button>
+          <button className="ml-1 flex min-w-[200px] items-center gap-2 border-b-2 border-transparent px-6 pb-3 text-slate-500 hover:text-slate-700">
+            <span className="material-symbols-outlined text-[18px] leading-none">
+              local_offer
+            </span>
+            <span>Promotions</span>
+          </button>
+          <button className="ml-1 flex min-w-[200px] items-center gap-2 border-b-2 border-transparent px-6 pb-3 text-slate-500 hover:text-slate-700">
+            <span className="material-symbols-outlined text-[18px] leading-none">
+              group
+            </span>
+            <span>Social</span>
+          </button>
+        </div>
+
+        {/* Loading body */}
+        <div className="flex-1 flex items-center justify-center text-sm text-slate-500">
+          Loading messages…
+        </div>
+      </section>
+    );
+  }
+
+  // 🔹 After mount, we can safely render the real list based on `emails`
   return (
     <section className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white pt-2 shadow-[0_1px_3px_rgba(60,64,67,0.2)]">
       {/* Toolbar row above tabs */}
@@ -112,7 +209,7 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
 
       {/* List */}
       <div className="flex-1 overflow-y-auto text-sm">
-        {emails.map(mail => {
+        {emails.map((mail) => {
           const isSelected = mail.id === selectedId;
           const isUnread = mail.unread;
           const isChecked = checkedIds.has(mail.id);
@@ -130,7 +227,7 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
               <div className="flex w-16 shrink-0 items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     toggleChecked(mail.id);
                   }}
@@ -144,7 +241,7 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
                 {/* ⭐ star toggle */}
                 <button
                   type="button"
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     toggleStarred(mail.id);
                   }}

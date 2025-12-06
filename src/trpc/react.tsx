@@ -69,6 +69,10 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
     })
   );
 
+  if (typeof window !== "undefined") {
+    (window as any).trpc = trpcClient;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>

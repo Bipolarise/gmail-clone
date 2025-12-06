@@ -2,5 +2,5 @@
   "version": 3,
   "sources": [],
   "sections": [
-    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Jonathan%20Liu/OneDrive/Desktop/gmail-clone/gmail-clone/src/app/%28home%29/layout.tsx"],"sourcesContent":["export default function HomeRouteLayout({\r\n  children,\r\n}: {\r\n  children: React.ReactNode;\r\n}) {\r\n  return (\r\n    <main className=\"min-h-screen bg-slate-950 text-white\">\r\n      {children}\r\n    </main>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;;AAAe,SAAS,gBAAgB,EACtC,QAAQ,EAGT;IACC,qBACE,6WAAC;QAAK,WAAU;kBACb;;;;;;AAGP","debugId":null}}]
+    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":["file:///Users/jonathanliu/Desktop/gmail-clone/src/app/%28home%29/layout.tsx"],"sourcesContent":["export default function HomeRouteLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <main className=\"min-h-screen bg-slate-950 text-white\">\n      {children}\n    </main>\n  );\n}\n"],"names":[],"mappings":";;;;;AAAe,SAAS,gBAAgB,EACtC,QAAQ,EAGT;IACC,qBACE,6WAAC;QAAK,WAAU;kBACb;;;;;;AAGP","debugId":null}}]
 }

@@ -16,6 +16,10 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
+
+  // Gmail relations
+  gmailThreads  GmailThread[]
+  gmailMessages GmailMessage[]
 }
 
 model Account {
@@ -53,4 +57,37 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+//
+// Gmail models
+//
+
+model GmailThread {
+  /// Gmail threadId
+  id        String   @id
+  userId    String
+  subject   String?
+  snippet   String?
+  updatedAt DateTime?
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  GmailMessage[]
+}
+
+model GmailMessage {
+  /// Gmail messageId
+  id           String   @id
+  threadId     String
+  userId       String
+  from         String?
+  to           String?
+  subject      String?
+  snippet      String?
+  internalDate DateTime?
+  s3Key        String?      // key/path of HTML body in S3
+  labelIds     String[]     // Gmail label IDs (e.g. ["INBOX","UNREAD"])
+
+  thread       GmailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
