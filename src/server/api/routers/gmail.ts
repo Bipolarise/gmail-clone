@@ -5,75 +5,65 @@ import type { gmail_v1 } from "googleapis";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { getGmailClientForUser } from "~/server/google/gmail";
 import { uploadEmailHtmlToS3 } from "~/server/aws/s3";
-import { db } from "~/server/db";
 
 export const gmailRouter = createTRPCRouter({
-  // ---------- 1) LIST THREADS FROM DB (cron-synced) ----------
-  listThreads: publicProcedure
-    .input(
-      z
-        .object({
-          page: z.number().int().min(1).default(1),
-          pageSize: z.number().int().min(1).max(100).default(50),
-        })
-        .optional(),
-    )
-    .query(async ({ ctx, input }) => {
-      if (!ctx.session?.user) {
-        return { threads: [], total: 0 };
-      }
+  // ---------- 1) LIST THREADS (lightweight metadata) ----------
+  listThreads: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.session || !ctx.session.user) return [];
 
-      const page = input?.page ?? 1;
-      const pageSize = input?.pageSize ?? 50;
-      const userId = ctx.session.user.id;
+    const gmail = await getGmailClientForUser(ctx.session.user.id);
 
-      // Total threads for this user (for "1–50 of X")
-      const total = await db.gmailThread.count({
-        where: { userId },
+    const res = await gmail.users.threads.list({
+      userId: "me",
+      maxResults: 358, // keep it low to avoid quotas
+    });
+
+    const threads = res.data.threads ?? [];
+    if (threads.length === 0) return [];
+
+    // Build up the result by looping instead of 50 parallel requests
+    const fullThreads: {
+      id: string;
+      threadId: string;
+      snippet: string;
+      subject: string;
+      from: string;
+      receivedAt: string;
+    }[] = [];
+
+    for (const t of threads) {
+      if (!t.id) continue;
+
+      const threadRes = await gmail.users.threads.get({
+        userId: "me",
+        id: t.id,
+        format: "metadata", // allowed for threads
+        metadataHeaders: ["Subject", "From", "Date"],
       });
 
-      // Latest threads first
-      const threads = await db.gmailThread.findMany({
-        where: { userId },
-        orderBy: { updatedAt: "desc" },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
+      const messages = threadRes.data.messages ?? [];
+      if (messages.length === 0) continue;
+
+      const lastMsg = messages[messages.length - 1]!;
+
+      const headers = lastMsg.payload?.headers ?? [];
+      const getHeader = (name: string) =>
+        headers.find(
+          (h) => h.name?.toLowerCase() === name.toLowerCase(),
+        )?.value ?? "";
+
+      fullThreads.push({
+        id: threadRes.data.id ?? t.id,
+        threadId: threadRes.data.id ?? t.id,
+        snippet: threadRes.data.snippet ?? "",
+        subject: getHeader("Subject"),
+        from: getHeader("From"),
+        receivedAt: getHeader("Date"),
       });
+    }
 
-      // Attach `from` + `receivedAt` using the latest message in each thread
-      const enriched = await Promise.all(
-        threads.map(async (t) => {
-          const lastMsg = await db.gmailMessage.findFirst({
-            where: { threadId: t.id, userId },
-            orderBy: { internalDate: "desc" },
-            select: {
-              from: true,
-              internalDate: true,
-            },
-          });
-
-          // make sure it's ALWAYS a Date object
-          const receivedAtDate =
-            lastMsg?.internalDate ??
-            t.updatedAt ??
-            new Date(0); // final guaranteed fallback
-
-          return {
-            id: t.id,
-            threadId: t.id,
-            snippet: t.snippet ?? "",
-            subject: t.subject ?? "",
-            from: lastMsg?.from ?? "",
-            receivedAt: receivedAtDate.toISOString(),
-          };
-        })
-      );
-
-      return {
-        threads: enriched,
-        total,
-      };
-    }),
+    return fullThreads;
+  }),
 
   // ---------- 2) GET FULL CONTENT FOR A SINGLE THREAD ----------
   getThreadDetail: publicProcedure
@@ -132,7 +122,7 @@ export const gmailRouter = createTRPCRouter({
           }
 
           if (part.parts) {
-            for (const child of part.parts ?? []) {
+            for (const child of part.parts) {
               const childRes = extractBody(child);
               if (!html && childRes.html) html = childRes.html;
               if (!text && childRes.text) text = childRes.text;
