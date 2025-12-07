@@ -9,11 +9,11 @@ type MailListProps = {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 
-  // ⬇️ new props for pagination
-  page: number;              // current page (1-based)
-  pageSize: number;          // e.g. 50
-  total: number;             // total filtered emails
-  onPageChange: (page: number) => void;
+  // OPTIONAL pagination props – safe if you don't pass them
+  page?: number;              // 1-based; default 1
+  pageSize?: number;          // default = emails.length (or 50)
+  total?: number;             // default = emails.length
+  onPageChange?: (page: number) => void;
 };
 
 export function MailList({
@@ -50,13 +50,28 @@ export function MailList({
     });
   };
 
-  // Pagination math
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const canPrev = page > 1;
-  const canNext = page < totalPages;
+  // ---- Pagination with safe defaults ----
+  const effectiveTotal = total ?? emails.length;
+  const effectivePageSize =
+    pageSize ?? (emails.length > 0 ? emails.length : 50);
+  const effectivePage = page ?? 1;
 
-  const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
-  const end = total === 0 ? 0 : Math.min(page * pageSize, total);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(effectiveTotal / effectivePageSize),
+  );
+  const canPrev = effectivePage > 1 && !!onPageChange;
+  const canNext =
+    effectivePage < totalPages && !!onPageChange;
+
+  const start =
+    effectiveTotal === 0
+      ? 0
+      : (effectivePage - 1) * effectivePageSize + 1;
+  const end =
+    effectiveTotal === 0
+      ? 0
+      : Math.min(effectivePage * effectivePageSize, effectiveTotal);
 
   // ----- SKELETON WHILE MOUNTING -----
   if (!hasMounted) {
@@ -100,6 +115,7 @@ export function MailList({
               type="button"
               className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
               aria-label="Previous page"
+              disabled
             >
               <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
                 chevron_left
@@ -109,6 +125,7 @@ export function MailList({
               type="button"
               className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
               aria-label="Next page"
+              disabled
             >
               <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
                 chevron_right
@@ -184,12 +201,14 @@ export function MailList({
 
         <div className="flex items-center gap-1 text-[12px]">
           <span>
-            {start}–{end} of {total}
+            {start}–{end} of {effectiveTotal}
           </span>
           <button
             type="button"
             disabled={!canPrev}
-            onClick={() => canPrev && onPageChange(page - 1)}
+            onClick={() =>
+              canPrev && onPageChange && onPageChange(effectivePage - 1)
+            }
             className={`flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4] ${
               !canPrev ? "cursor-not-allowed opacity-40" : ""
             }`}
@@ -202,7 +221,9 @@ export function MailList({
           <button
             type="button"
             disabled={!canNext}
-            onClick={() => canNext && onPageChange(page + 1)}
+            onClick={() =>
+              canNext && onPageChange && onPageChange(effectivePage + 1)
+            }
             className={`flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4] ${
               !canNext ? "cursor-not-allowed opacity-40" : ""
             }`}
