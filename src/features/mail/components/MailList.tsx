@@ -1,3 +1,4 @@
+// src/features/mail/components/MailList.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,9 +8,23 @@ type MailListProps = {
   emails: MailItem[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+
+  // ⬇️ new props for pagination
+  page: number;              // current page (1-based)
+  pageSize: number;          // e.g. 50
+  total: number;             // total filtered emails
+  onPageChange: (page: number) => void;
 };
 
-export function MailList({ emails, selectedId, onSelect }: MailListProps) {
+export function MailList({
+  emails,
+  selectedId,
+  onSelect,
+  page,
+  pageSize,
+  total,
+  onPageChange,
+}: MailListProps) {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(() => new Set());
   const [starredIds, setStarredIds] = useState<Set<string>>(() => new Set());
 
@@ -35,8 +50,15 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
     });
   };
 
-  // 🔹 On the very first render, don't use `emails` at all.
-  // This makes SSR HTML == initial client HTML, so no hydration mismatch.
+  // Pagination math
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const canPrev = page > 1;
+  const canNext = page < totalPages;
+
+  const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = total === 0 ? 0 : Math.min(page * pageSize, total);
+
+  // ----- SKELETON WHILE MOUNTING -----
   if (!hasMounted) {
     return (
       <section className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white pt-2 shadow-[0_1px_3px_rgba(60,64,67,0.2)]">
@@ -125,7 +147,7 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
     );
   }
 
-  // 🔹 After mount, we can safely render the real list based on `emails`
+  // ----- REAL LIST AFTER MOUNT -----
   return (
     <section className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white pt-2 shadow-[0_1px_3px_rgba(60,64,67,0.2)]">
       {/* Toolbar row above tabs */}
@@ -162,11 +184,15 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
 
         <div className="flex items-center gap-1 text-[12px]">
           <span>
-            1–{emails.length} of {emails.length}
+            {start}–{end} of {total}
           </span>
           <button
             type="button"
-            className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+            disabled={!canPrev}
+            onClick={() => canPrev && onPageChange(page - 1)}
+            className={`flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4] ${
+              !canPrev ? "cursor-not-allowed opacity-40" : ""
+            }`}
             aria-label="Previous page"
           >
             <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
@@ -175,7 +201,11 @@ export function MailList({ emails, selectedId, onSelect }: MailListProps) {
           </button>
           <button
             type="button"
-            className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+            disabled={!canNext}
+            onClick={() => canNext && onPageChange(page + 1)}
+            className={`flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4] ${
+              !canNext ? "cursor-not-allowed opacity-40" : ""
+            }`}
             aria-label="Next page"
           >
             <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">

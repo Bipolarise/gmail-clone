@@ -1,7 +1,7 @@
 // src/features/mail/components/MailApp.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import type { Session } from "next-auth";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -19,6 +19,8 @@ type MailAppProps = {
 
 type ViewMode = "list" | "detail";
 
+const PAGE_SIZE = 50; // ⬅️ 50 threads per page
+
 export function MailApp({ session }: MailAppProps) {
   const primaryIdentity =
     session.user?.email ?? session.user?.name ?? "You";
@@ -31,8 +33,9 @@ export function MailApp({ session }: MailAppProps) {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [page, setPage] = useState(1); // ⬅️ current page (1-based)
 
-  // 1) Fetch Gmail threads
+  // 1) Fetch Gmail threads (up to 400 as per backend)
   const { data: threads = [] } = useSuspenseQuery(
     trpc.gmail.listThreads.queryOptions(undefined, {
       enabled: !!session.user, // only if logged in
@@ -77,7 +80,7 @@ export function MailApp({ session }: MailAppProps) {
     [threads],
   );
 
-  // 3) Filtering & selection
+  // 3) Filtering (label + search)
   const filteredEmails = useMemo(() => {
     return mailItems.filter((mail) => {
       if (activeLabel === "INBOX" && mail.label !== "INBOX") return false;
@@ -94,16 +97,31 @@ export function MailApp({ session }: MailAppProps) {
     });
   }, [activeLabel, search, mailItems]);
 
+  // Whenever label or search changes, reset back to page 1
+  useEffect(() => {
+    setPage(1);
+    setSelectedId(null);
+    setViewMode("list");
+  }, [activeLabel, search]);
+
+  // 4) Pagination (50 per page)
+  const totalEmails = filteredEmails.length;
+  const totalPages = Math.max(1, Math.ceil(totalEmails / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+
+  const pageStartIndex = (currentPage - 1) * PAGE_SIZE;
+  const pageEndIndex = pageStartIndex + PAGE_SIZE;
+  const pagedEmails = filteredEmails.slice(pageStartIndex, pageEndIndex);
+
   const selectedMail: MailItem | null =
     filteredEmails.find((m) => m.id === selectedId) ?? null;
 
   const unreadInboxCount = useMemo(
-    () =>
-      mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
+    () => mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
     [mailItems],
   );
 
-  // 4) UI
+  // 5) UI
   return (
     <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
       {/* Left icon rail spanning full height */}
@@ -221,8 +239,6 @@ export function MailApp({ session }: MailAppProps) {
               unreadInboxCount={unreadInboxCount}
               onLabelChange={(label) => {
                 setActiveLabel(label);
-                setViewMode("list");
-                setSelectedId(null);
               }}
             />
           )}
@@ -231,11 +247,19 @@ export function MailApp({ session }: MailAppProps) {
           <div className="flex flex-1 overflow-hidden px-4 pt-3 pb-4">
             {viewMode === "list" && (
               <MailList
-                emails={filteredEmails}
+                emails={pagedEmails}
                 selectedId={selectedId}
                 onSelect={(id) => {
                   setSelectedId(id);
-                  setViewMode("detail");
+                  if (id) setViewMode("detail");
+                }}
+                page={currentPage}
+                pageSize={PAGE_SIZE}
+                total={totalEmails}
+                onPageChange={(nextPage) => {
+                  setPage(nextPage);
+                  setSelectedId(null);
+                  setViewMode("list");
                 }}
               />
             )}
