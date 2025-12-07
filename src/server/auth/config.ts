@@ -46,7 +46,6 @@ export const authConfig = {
             "https://www.googleapis.com/auth/gmail.modify",
             "https://www.googleapis.com/auth/gmail.send",
             "https://www.googleapis.com/auth/gmail.compose",
-            "https://www.googleapis.com/auth/gmail.metadata",
           ].join(" "),
           access_type: "offline", // needed for refresh tokens
           prompt: "consent",      // forces Google to reissue refresh token

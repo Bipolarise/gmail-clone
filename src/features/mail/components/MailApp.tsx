@@ -20,67 +20,9 @@ type MailAppProps = {
 type ViewMode = "list" | "detail";
 
 export function MailApp({ session }: MailAppProps) {
-  // --- 0) Figure out if we're on the client or during SSR/build ---
-  const isClient = typeof window !== "undefined";
-
   const primaryIdentity =
     session.user?.email ?? session.user?.name ?? "You";
   const avatarInitial = primaryIdentity.charAt(0).toUpperCase();
-
-  /**
-   * SERVER / BUILD RENDER:
-   * We DO NOT call any React hooks that talk to tRPC / Gmail here.
-   * This avoids the "fetch failed" build error.
-   */
-  if (!isClient) {
-    return (
-      <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
-        <MailAppRail unreadInboxCount={0} onToggleSidebar={() => {}} />
-
-        <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center bg-[#f6f8fc] px-4">
-            <div className="flex w-56 items-center">
-              <Image
-                src="/gmail.png"
-                alt="Gmail"
-                width={150}
-                height={50}
-                className="h-9 w-auto"
-                priority
-              />
-            </div>
-
-            <div className="flex flex-1">
-              <div className="flex w-full max-w-2xl items-center rounded-full bg-[#eaf1fb] px-4 py-2 text-sm text-slate-700 shadow-inner">
-                <span className="material-symbols-outlined mr-2 text-[18px] text-slate-500">
-                  search
-                </span>
-                <span className="text-xs text-slate-500">
-                  Loading your mail…
-                </span>
-              </div>
-            </div>
-
-            <div className="ml-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
-                {avatarInitial}
-              </div>
-            </div>
-          </header>
-
-          <div className="flex flex-1 items-center justify-center text-sm text-slate-500">
-            Preparing your inbox…
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /**
-   * CLIENT RENDER:
-   * From here down we're safely in the browser, so it's OK to use hooks
-   * and call tRPC / Gmail.
-   */
 
   const trpc = useTRPC();
 
@@ -90,7 +32,7 @@ export function MailApp({ session }: MailAppProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // 1) Fetch Gmail threads on the client
+  // 1) Fetch Gmail threads
   const { data: threads = [] } = useSuspenseQuery(
     trpc.gmail.listThreads.queryOptions(undefined, {
       enabled: !!session.user, // only if logged in
@@ -161,7 +103,7 @@ export function MailApp({ session }: MailAppProps) {
     [mailItems],
   );
 
-  // 4) UI (same as before)
+  // 4) UI
   return (
     <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
       {/* Left icon rail spanning full height */}
