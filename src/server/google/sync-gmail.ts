@@ -14,7 +14,7 @@ export async function syncUserGmail(opts: {
   userId: string;
   maxThreads?: number;
 }): Promise<number> {
-  const { userId, maxThreads = 400 } = opts;
+  const { userId, maxThreads = 40 } = opts;
 
   const gmail = await getGmailClientForUser(userId);
 

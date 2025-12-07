@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     for (const { id: userId } of accounts) {
       const count = await syncUserGmail({
         userId,
-        maxThreads: 400,
+        maxThreads: 40,
       });
 
       totalThreads += count;
