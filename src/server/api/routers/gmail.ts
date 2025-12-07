@@ -15,7 +15,7 @@ export const gmailRouter = createTRPCRouter({
 
     const res = await gmail.users.threads.list({
       userId: "me",
-      maxResults: 400, // keep it low to avoid quotas
+      maxResults: 50, // keep it low to avoid quotas
     });
 
     const threads = res.data.threads ?? [];
