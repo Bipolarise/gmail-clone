@@ -33,7 +33,6 @@ export const gmailRouter = createTRPCRouter({
           take: 1, // last message as the summary
         },
       },
-      take: 400, // can tweak this
     });
 
     return threads.map((t): ThreadRow => {
