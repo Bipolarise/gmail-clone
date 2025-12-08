@@ -5,64 +5,52 @@ import type { gmail_v1 } from "googleapis";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { getGmailClientForUser } from "~/server/google/gmail";
 import { uploadEmailHtmlToS3 } from "~/server/aws/s3";
+import { db } from "~/server/db";
+
+type ThreadRow = {
+  id: string;
+  threadId: string;
+  snippet: string;
+  subject: string;
+  from: string;
+  receivedAt: string;
+};
 
 export const gmailRouter = createTRPCRouter({
-  // ---------- 1) LIST THREADS (lightweight metadata) ----------
+  // ---------- 1) LIST THREADS (FROM DB, synced by cron) ----------
   listThreads: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.session || !ctx.session.user) return [];
 
-    const gmail = await getGmailClientForUser(ctx.session.user.id);
+    const userId = ctx.session.user.id;
 
-    const res = await gmail.users.threads.list({
-      userId: "me",
-      maxResults: 358, // keep it low to avoid quotas
+    // Read from GmailThread/GmailMessage that cron has synced
+    const threads = await db.gmailThread.findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      include: {
+        messages: {
+          orderBy: { internalDate: "desc" },
+          take: 1, // last message as the summary
+        },
+      },
+      take: 400, // can tweak this
     });
 
-    const threads = res.data.threads ?? [];
-    if (threads.length === 0) return [];
+    return threads.map((t): ThreadRow => {
+      const last = t.messages[0];
 
-    // Build up the result by looping instead of 50 parallel requests
-    const fullThreads: {
-      id: string;
-      threadId: string;
-      snippet: string;
-      subject: string;
-      from: string;
-      receivedAt: string;
-    }[] = [];
+      const received =
+        last?.internalDate ?? t.updatedAt ?? new Date();
 
-    for (const t of threads) {
-      if (!t.id) continue;
-
-      const threadRes = await gmail.users.threads.get({
-        userId: "me",
-        id: t.id,
-        format: "metadata", // allowed for threads
-        metadataHeaders: ["Subject", "From", "Date"],
-      });
-
-      const messages = threadRes.data.messages ?? [];
-      if (messages.length === 0) continue;
-
-      const lastMsg = messages[messages.length - 1]!;
-
-      const headers = lastMsg.payload?.headers ?? [];
-      const getHeader = (name: string) =>
-        headers.find(
-          (h) => h.name?.toLowerCase() === name.toLowerCase(),
-        )?.value ?? "";
-
-      fullThreads.push({
-        id: threadRes.data.id ?? t.id,
-        threadId: threadRes.data.id ?? t.id,
-        snippet: threadRes.data.snippet ?? "",
-        subject: getHeader("Subject"),
-        from: getHeader("From"),
-        receivedAt: getHeader("Date"),
-      });
-    }
-
-    return fullThreads;
+      return {
+        id: t.id, // gmail threadId
+        threadId: t.id,
+        snippet: t.snippet ?? last?.snippet ?? "",
+        subject: t.subject ?? last?.subject ?? "",
+        from: last?.from ?? "",
+        receivedAt: received.toISOString(),
+      };
+    });
   }),
 
   // ---------- 2) GET FULL CONTENT FOR A SINGLE THREAD ----------
@@ -78,7 +66,7 @@ export const gmailRouter = createTRPCRouter({
         const threadRes = await gmail.users.threads.get({
           userId: "me",
           id: input.threadId,
-          format: "full", // allowed by the Caribou/Gmail proxy
+          format: "full",
         });
 
         const messages = threadRes.data.messages ?? [];
@@ -143,6 +131,7 @@ export const gmailRouter = createTRPCRouter({
               html,
             });
             s3Url = url;
+            // (optional) you could later store url in GmailMessage.s3Key using ctx.db.gmailMessage
           } catch (s3Err) {
             // Don't break the UI if S3 fails – just log it
             // eslint-disable-next-line no-console
