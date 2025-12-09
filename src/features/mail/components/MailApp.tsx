@@ -4,14 +4,18 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import type { Session } from "next-auth";
-import { useSuspenseQuery } from "@tanstack/react-query";
+
+// React Query
+import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 
 import { MailSidebar } from "./MailSidebar";
 import { MailList } from "./MailList";
 import { MailDetail } from "./MailDetail";
 import { MailAppRail } from "./MailAppRail";
 import { MailComposeModal } from "./MailComposeModal";
+
 import { type MailItem, type MailLabel } from "../types/mail";
+
 import { useTRPC } from "~/trpc/react";
 
 type MailAppProps = {
@@ -27,8 +31,26 @@ export function MailApp({ session }: MailAppProps) {
     session.user?.email ?? session.user?.name ?? "You";
   const avatarInitial = primaryIdentity.charAt(0).toUpperCase();
 
+  // tRPC client wrapper (queryOptions + mutationOptions)
   const trpc = useTRPC();
 
+  // ------------------------------------------------------
+  // ✅ SEND EMAIL MUTATION (CORRECT FOR YOUR TRPC SETUP)
+  // ------------------------------------------------------
+  const sendEmail = useMutation(
+    trpc.gmail.sendEmail.mutationOptions({
+      onSuccess: () => {
+        console.log("Email sent successfully!");
+      },
+      onError: (err) => {
+        console.error("Failed to send email:", err);
+      },
+    })
+  );
+
+  // ------------------------------------------------------
+  // UI STATE
+  // ------------------------------------------------------
   const [activeLabel, setActiveLabel] = useState<MailLabel>("INBOX");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -37,19 +59,19 @@ export function MailApp({ session }: MailAppProps) {
   const [page, setPage] = useState(1);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
 
-  // ---------------------------
-  // 1) Fetch Gmail threads
-  // ---------------------------
+  // ------------------------------------------------------
+  // FETCH THREADS
+  // ------------------------------------------------------
   const { data: threads = [] } = useSuspenseQuery(
     trpc.gmail.listThreads.queryOptions(undefined, {
       enabled: !!session.user,
       staleTime: 30_000,
-    }),
+    })
   );
 
-  // ---------------------------
-  // 2) Convert threads → MailItem[]
-  // ---------------------------
+  // ------------------------------------------------------
+  // MAP THREADS → MAIL ITEMS
+  // ------------------------------------------------------
   const mailItems: MailItem[] = useMemo(
     () =>
       threads.map((t) => {
@@ -80,20 +102,19 @@ export function MailApp({ session }: MailAppProps) {
           receivedAtTime,
           receivedAtFull,
           unread: false,
-        } satisfies MailItem;
+        };
       }),
-    [threads],
+    [threads]
   );
 
-  // ---------------------------
-  // 3) Search/filtering
-  // ---------------------------
+  // ------------------------------------------------------
+  // SEARCH + FILTER
+  // ------------------------------------------------------
   const filteredEmails = useMemo(() => {
     return mailItems.filter((mail) => {
-      if (activeLabel === "INBOX" && mail.label !== "INBOX") return false;
-      if (activeLabel !== "INBOX" && mail.label !== activeLabel) return false;
-
       const q = search.toLowerCase();
+
+      if (activeLabel !== mail.label) return false;
       if (!q) return true;
 
       return (
@@ -102,38 +123,39 @@ export function MailApp({ session }: MailAppProps) {
         mail.snippet.toLowerCase().includes(q)
       );
     });
-  }, [activeLabel, search, mailItems]);
+  }, [search, activeLabel, mailItems]);
 
-  // Reset pagination when searching/changing labels
+  // Reset pagination when search or label changes
   useEffect(() => {
     setPage(1);
     setSelectedId(null);
     setViewMode("list");
-  }, [activeLabel, search]);
+  }, [search, activeLabel]);
 
-  // ---------------------------
-  // 4) Pagination
-  // ---------------------------
+  // ------------------------------------------------------
+  // PAGINATION
+  // ------------------------------------------------------
   const totalEmails = filteredEmails.length;
   const totalPages = Math.max(1, Math.ceil(totalEmails / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
 
-  const pageStartIndex = (currentPage - 1) * PAGE_SIZE;
-  const pageEndIndex = pageStartIndex + PAGE_SIZE;
-
-  const pagedEmails = filteredEmails.slice(pageStartIndex, pageEndIndex);
+  const pagedEmails = filteredEmails.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    (currentPage - 1) * PAGE_SIZE + PAGE_SIZE
+  );
 
   const selectedMail =
     filteredEmails.find((m) => m.id === selectedId) ?? null;
 
   const unreadInboxCount = useMemo(
-    () => mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
-    [mailItems],
+    () =>
+      mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
+    [mailItems]
   );
 
-  // ---------------------------
-  // 5) Render UI
-  // ---------------------------
+  // ------------------------------------------------------
+  // RENDER
+  // ------------------------------------------------------
   return (
     <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
       <MailAppRail
@@ -142,7 +164,7 @@ export function MailApp({ session }: MailAppProps) {
       />
 
       <div className="flex flex-1 flex-col">
-        {/* Header */}
+        {/* HEADER */}
         <header className="flex h-14 items-center bg-[#f6f8fc] px-4">
           <div className="flex w-56 items-center">
             <Image
@@ -155,7 +177,7 @@ export function MailApp({ session }: MailAppProps) {
             />
           </div>
 
-          <div className="flex flex-1">
+          <div className="flex flex-1 justify-center">
             <div className="flex w-full max-w-2xl items-center rounded-full bg-[#eaf1fb] px-4 py-2 text-sm text-slate-700 shadow-inner">
               <span className="material-symbols-outlined mr-2 text-[18px] text-slate-500">
                 search
@@ -169,50 +191,21 @@ export function MailApp({ session }: MailAppProps) {
             </div>
           </div>
 
-          {/* Right header icons */}
+          {/* PROFILE */}
           <div className="ml-4 flex items-center gap-3">
-            <button
-              type="button"
-              className="flex items-center rounded-full bg-[#eaf1fb] px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-[#dde6fb]"
-            >
-              <span className="mr-2 inline-flex h-2.5 w-2.5 rounded-full bg-[#34a853]" />
-              <span>Active</span>
-              <span className="material-symbols-outlined ml-1 text-[18px] text-slate-500">
-                expand_more
-              </span>
-            </button>
-
-            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
-              <span className="material-symbols-outlined text-[20px] text-slate-600">help</span>
-            </button>
-
-            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
-              <span className="material-symbols-outlined text-[20px] text-slate-600">settings</span>
-            </button>
-
-            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
-              <span className="material-symbols-outlined text-[20px] text-slate-600">magic_button</span>
-            </button>
-
-            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
-              <span className="material-symbols-outlined text-[20px] text-slate-600">apps</span>
-            </button>
-
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
-                {avatarInitial}
-              </div>
-              <a
-                href="/api/auth/signout"
-                className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
-              >
-                Sign out
-              </a>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
+              {avatarInitial}
             </div>
+            <a
+              href="/api/auth/signout"
+              className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+            >
+              Sign out
+            </a>
           </div>
         </header>
 
-        {/* Layout below header */}
+        {/* BODY */}
         <div className="flex flex-1 overflow-hidden">
           {isSidebarOpen && (
             <MailSidebar
@@ -230,13 +223,13 @@ export function MailApp({ session }: MailAppProps) {
                 selectedId={selectedId}
                 onSelect={(id) => {
                   setSelectedId(id);
-                  if (id) setViewMode("detail");
+                  setViewMode("detail");
                 }}
                 page={currentPage}
                 pageSize={PAGE_SIZE}
                 total={totalEmails}
-                onPageChange={(nextPage) => {
-                  setPage(nextPage);
+                onPageChange={(p) => {
+                  setPage(p);
                   setSelectedId(null);
                   setViewMode("list");
                 }}
@@ -253,15 +246,13 @@ export function MailApp({ session }: MailAppProps) {
         </div>
       </div>
 
-      {/* Compose modal */}
+      {/* COMPOSE MODAL */}
       <MailComposeModal
         open={isComposeOpen}
         onClose={() => setIsComposeOpen(false)}
         onSend={async (payload) => {
-          // 🔥 Correct way to call your mutation
-          await trpc.gmail.sendEmail(payload);
-
-          // Optional: refetch thread list later if needed
+          await sendEmail.mutateAsync(payload);
+          setIsComposeOpen(false);
         }}
       />
     </div>
