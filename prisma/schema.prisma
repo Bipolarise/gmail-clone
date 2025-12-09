@@ -14,28 +14,29 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  accounts      Account[]
-  sessions      Session[]
+  accounts Account[]
+  sessions Session[]
 
   // Gmail relations
-  gmailThreads  GmailThread[]
-  gmailMessages GmailMessage[]
+  gmailThreads   GmailThread[]
+  gmailMessages  GmailMessage[]
+  gmailSyncState GmailSyncState?
 }
 
 model Account {
-  id                        String   @id @default(cuid())
-  userId                    String
-  type                      String
-  provider                  String
-  providerAccountId         String
-  refresh_token             String?  @db.Text
-  access_token              String?  @db.Text
-  expires_at                Int?
-  token_type                String?
-  scope                     String?
-  id_token                  String?  @db.Text
-  session_state             String?
-  refresh_token_expires_in  Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+  refresh_token_expires_in Int?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -65,19 +66,19 @@ model VerificationToken {
 
 model GmailThread {
   /// Gmail threadId
-  id        String   @id
+  id        String    @id
   userId    String
   subject   String?
   snippet   String?
   updatedAt DateTime?
 
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  GmailMessage[]
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages GmailMessage[]
 }
 
 model GmailMessage {
   /// Gmail messageId
-  id           String   @id
+  id           String    @id
   threadId     String
   userId       String
   from         String?
@@ -85,9 +86,17 @@ model GmailMessage {
   subject      String?
   snippet      String?
   internalDate DateTime?
-  s3Key        String?      // key/path of HTML body in S3
-  labelIds     String[]     // Gmail label IDs (e.g. ["INBOX","UNREAD"])
+  s3Key        String? // key/path of HTML body in S3
+  labelIds     String[] // Gmail label IDs (e.g. ["INBOX","UNREAD"])
 
-  thread       GmailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread GmailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GmailSyncState {
+  userId            String  @id
+  backfillPageToken String?
+  backfillDone      Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
