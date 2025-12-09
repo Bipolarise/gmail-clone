@@ -1,3 +1,4 @@
+// src/app/api/cron/sync-gmail/route.ts
 import { NextResponse } from "next/server";
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -9,32 +10,27 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
 
-  // security check
   if (!token || token !== env.CRON_SECRET) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
   try {
-    // FIXED: load actual users, not accounts table
-    const accounts = await db.user.findMany({
-      select: { id: true },
-    });
+    const users = await db.user.findMany({ select: { id: true } });
 
     let totalThreads = 0;
 
-    for (const { id: userId } of accounts) {
+    for (const { id: userId } of users) {
       const count = await syncUserGmail({
         userId,
-        maxThreads: 40,
+        maxThreads: 450,
       });
-
       totalThreads += count;
     }
 
     return NextResponse.json({
       ok: true,
       syncedThreads: totalThreads,
-      users: accounts.length,
+      users: users.length,
     });
   } catch (err) {
     console.error("CRON Gmail sync failed", err);
