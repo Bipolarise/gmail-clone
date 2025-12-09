@@ -1,3 +1,4 @@
+// src/features/mail/components/MailSidebar.tsx
 "use client";
 
 import type { MailLabel } from "../types/mail";
@@ -6,6 +7,7 @@ type MailSidebarProps = {
   activeLabel: MailLabel;
   unreadInboxCount: number;
   onLabelChange: (label: MailLabel) => void;
+  onCompose?: () => void; // 👈 added
 };
 
 const LABELS: { id: MailLabel; name: string; icon: string }[] = [
@@ -19,6 +21,7 @@ export function MailSidebar({
   activeLabel,
   unreadInboxCount,
   onLabelChange,
+  onCompose,
 }: MailSidebarProps) {
   return (
     <aside className="flex w-56 flex-col bg-[#f6f8fc]">
@@ -26,6 +29,7 @@ export function MailSidebar({
       <div className="px-3 pt-3 pb-2">
         <button
           type="button"
+          onClick={() => onCompose?.()}
           className="inline-flex items-center gap-2 rounded-2xl bg-[#c2e7ff] px-5 py-3 text-[13px] font-medium text-slate-900 shadow-sm hover:bg-[#b3ddff]"
         >
           <span className="material-symbols-outlined text-[18px] text-slate-900">

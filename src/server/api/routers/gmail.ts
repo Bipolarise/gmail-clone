@@ -1,6 +1,7 @@
 // src/server/api/routers/gmail.ts
 import { z } from "zod";
 import type { gmail_v1 } from "googleapis";
+import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { getGmailClientForUser } from "~/server/google/gmail";
@@ -171,5 +172,66 @@ export const gmailRouter = createTRPCRouter({
           s3Url: null,
         };
       }
+    }),
+
+  // ---------- 3) SEND EMAIL ----------
+  sendEmail: publicProcedure
+    .input(
+      z.object({
+        to: z.string().min(1, "Recipient is required"),
+        cc: z.string().optional(),
+        bcc: z.string().optional(),
+        subject: z.string().default(""),
+        body: z.string().default(""),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.session || !ctx.session.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const gmail = await getGmailClientForUser(ctx.session.user.id);
+      const fromAddress = ctx.session.user.email ?? "me";
+
+      // Build a simple RFC822 email
+      const lines: string[] = [
+        `From: ${fromAddress}`,
+        `To: ${input.to}`,
+      ];
+
+      if (input.cc && input.cc.trim()) {
+        lines.push(`Cc: ${input.cc}`);
+      }
+      if (input.bcc && input.bcc.trim()) {
+        lines.push(`Bcc: ${input.bcc}`);
+      }
+
+      lines.push(
+        `Subject: ${input.subject}`,
+        'Content-Type: text/plain; charset="UTF-8"',
+        "",
+        input.body ?? "",
+      );
+
+      const raw = lines.join("\r\n");
+
+      // base64url encode
+      const encodedMessage = Buffer.from(raw)
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      const res = await gmail.users.messages.send({
+        userId: "me",
+        requestBody: {
+          raw: encodedMessage,
+        },
+      });
+
+      return {
+        id: res.data.id ?? null,
+        threadId: res.data.threadId ?? null,
+      };
     }),
 });

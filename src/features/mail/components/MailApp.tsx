@@ -10,6 +10,7 @@ import { MailSidebar } from "./MailSidebar";
 import { MailList } from "./MailList";
 import { MailDetail } from "./MailDetail";
 import { MailAppRail } from "./MailAppRail";
+import { MailComposeModal } from "./MailComposeModal";
 import { type MailItem, type MailLabel } from "../types/mail";
 import { useTRPC } from "~/trpc/react";
 
@@ -19,7 +20,7 @@ type MailAppProps = {
 
 type ViewMode = "list" | "detail";
 
-const PAGE_SIZE = 50; // ⬅️ 50 threads per page
+const PAGE_SIZE = 50;
 
 export function MailApp({ session }: MailAppProps) {
   const primaryIdentity =
@@ -33,17 +34,22 @@ export function MailApp({ session }: MailAppProps) {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [page, setPage] = useState(1); // ⬅️ current page (1-based)
+  const [page, setPage] = useState(1);
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
 
-  // 1) Fetch Gmail threads (up to 400 as per backend)
+  // ---------------------------
+  // 1) Fetch Gmail threads
+  // ---------------------------
   const { data: threads = [] } = useSuspenseQuery(
     trpc.gmail.listThreads.queryOptions(undefined, {
-      enabled: !!session.user, // only if logged in
+      enabled: !!session.user,
       staleTime: 30_000,
     }),
   );
 
-  // 2) Map raw threads -> MailItem[]
+  // ---------------------------
+  // 2) Convert threads → MailItem[]
+  // ---------------------------
   const mailItems: MailItem[] = useMemo(
     () =>
       threads.map((t) => {
@@ -54,7 +60,6 @@ export function MailApp({ session }: MailAppProps) {
         });
         const receivedAtFull = received.toLocaleString("en-AU");
 
-        // Try to split "Name <email@x.com>"
         const fromEmailMatch =
           typeof t.from === "string" ? t.from.match(/<([^>]+)>/) : null;
 
@@ -65,22 +70,24 @@ export function MailApp({ session }: MailAppProps) {
 
         return {
           id: t.id,
-          label: "INBOX", // everything in INBOX for now
+          label: "INBOX",
           from: fromName,
           fromEmail: fromEmailMatch?.[1] ?? "",
           subject: t.subject || "(no subject)",
           snippet: t.snippet || "",
-          body: t.snippet || "", // placeholder until you fetch full HTML
+          body: t.snippet || "",
           receivedAt: received,
           receivedAtTime,
           receivedAtFull,
-          unread: false, // can wire up Gmail's UNREAD flag later
+          unread: false,
         } satisfies MailItem;
       }),
     [threads],
   );
 
-  // 3) Filtering (label + search)
+  // ---------------------------
+  // 3) Search/filtering
+  // ---------------------------
   const filteredEmails = useMemo(() => {
     return mailItems.filter((mail) => {
       if (activeLabel === "INBOX" && mail.label !== "INBOX") return false;
@@ -97,23 +104,26 @@ export function MailApp({ session }: MailAppProps) {
     });
   }, [activeLabel, search, mailItems]);
 
-  // Whenever label or search changes, reset back to page 1
+  // Reset pagination when searching/changing labels
   useEffect(() => {
     setPage(1);
     setSelectedId(null);
     setViewMode("list");
   }, [activeLabel, search]);
 
-  // 4) Pagination (50 per page)
+  // ---------------------------
+  // 4) Pagination
+  // ---------------------------
   const totalEmails = filteredEmails.length;
   const totalPages = Math.max(1, Math.ceil(totalEmails / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
 
   const pageStartIndex = (currentPage - 1) * PAGE_SIZE;
   const pageEndIndex = pageStartIndex + PAGE_SIZE;
+
   const pagedEmails = filteredEmails.slice(pageStartIndex, pageEndIndex);
 
-  const selectedMail: MailItem | null =
+  const selectedMail =
     filteredEmails.find((m) => m.id === selectedId) ?? null;
 
   const unreadInboxCount = useMemo(
@@ -121,20 +131,19 @@ export function MailApp({ session }: MailAppProps) {
     [mailItems],
   );
 
-  // 5) UI
+  // ---------------------------
+  // 5) Render UI
+  // ---------------------------
   return (
     <div className="flex h-screen bg-[#f6f8fc] text-slate-900">
-      {/* Left icon rail spanning full height */}
       <MailAppRail
         unreadInboxCount={unreadInboxCount}
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
       />
 
-      {/* Right side: column with header + main content */}
       <div className="flex flex-1 flex-col">
-        {/* Top app bar */}
+        {/* Header */}
         <header className="flex h-14 items-center bg-[#f6f8fc] px-4">
-          {/* Gmail logo area – same width as sidebar so search lines up with card */}
           <div className="flex w-56 items-center">
             <Image
               src="/gmail.png"
@@ -146,7 +155,6 @@ export function MailApp({ session }: MailAppProps) {
             />
           </div>
 
-          {/* Search bar aligned above white mail card */}
           <div className="flex flex-1">
             <div className="flex w-full max-w-2xl items-center rounded-full bg-[#eaf1fb] px-4 py-2 text-sm text-slate-700 shadow-inner">
               <span className="material-symbols-outlined mr-2 text-[18px] text-slate-500">
@@ -161,9 +169,8 @@ export function MailApp({ session }: MailAppProps) {
             </div>
           </div>
 
-          {/* Right side: status pill + icons + avatar + sign out */}
+          {/* Right header icons */}
           <div className="ml-4 flex items-center gap-3">
-            {/* Active status pill */}
             <button
               type="button"
               className="flex items-center rounded-full bg-[#eaf1fb] px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-[#dde6fb]"
@@ -175,48 +182,22 @@ export function MailApp({ session }: MailAppProps) {
               </span>
             </button>
 
-            {/* Icon buttons */}
-            <button
-              type="button"
-              className="rounded-full p-1.5 hover:bg-[#e8eaed]"
-              aria-label="Support"
-            >
-              <span className="material-symbols-outlined text-[20px] text-slate-600">
-                help
-              </span>
+            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
+              <span className="material-symbols-outlined text-[20px] text-slate-600">help</span>
             </button>
 
-            <button
-              type="button"
-              className="rounded-full p-1.5 hover:bg-[#e8eaed]"
-              aria-label="Settings"
-            >
-              <span className="material-symbols-outlined text-[20px] text-slate-600">
-                settings
-              </span>
+            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
+              <span className="material-symbols-outlined text-[20px] text-slate-600">settings</span>
             </button>
 
-            <button
-              type="button"
-              className="rounded-full p-1.5 hover:bg-[#e8eaed]"
-              aria-label="Quick settings"
-            >
-              <span className="material-symbols-outlined text-[20px] text-slate-600">
-                magic_button
-              </span>
+            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
+              <span className="material-symbols-outlined text-[20px] text-slate-600">magic_button</span>
             </button>
 
-            <button
-              type="button"
-              className="rounded-full p-1.5 hover:bg-[#e8eaed]"
-              aria-label="Google apps"
-            >
-              <span className="material-symbols-outlined text-[20px] text-slate-600">
-                apps
-              </span>
+            <button className="rounded-full p-1.5 hover:bg-[#e8eaed]">
+              <span className="material-symbols-outlined text-[20px] text-slate-600">apps</span>
             </button>
 
-            {/* Avatar + sign out */}
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
                 {avatarInitial}
@@ -231,19 +212,17 @@ export function MailApp({ session }: MailAppProps) {
           </div>
         </header>
 
-        {/* Main layout: sidebar + (list OR detail) */}
+        {/* Layout below header */}
         <div className="flex flex-1 overflow-hidden">
           {isSidebarOpen && (
             <MailSidebar
               activeLabel={activeLabel}
               unreadInboxCount={unreadInboxCount}
-              onLabelChange={(label) => {
-                setActiveLabel(label);
-              }}
+              onLabelChange={(label) => setActiveLabel(label)}
+              onCompose={() => setIsComposeOpen(true)}
             />
           )}
 
-          {/* Center content area – Gmail-style card sits inside here */}
           <div className="flex flex-1 overflow-hidden px-4 pt-3 pb-4">
             {viewMode === "list" && (
               <MailList
@@ -273,6 +252,18 @@ export function MailApp({ session }: MailAppProps) {
           </div>
         </div>
       </div>
+
+      {/* Compose modal */}
+      <MailComposeModal
+        open={isComposeOpen}
+        onClose={() => setIsComposeOpen(false)}
+        onSend={async (payload) => {
+          // 🔥 Correct way to call your mutation
+          await trpc.gmail.sendEmail(payload);
+
+          // Optional: refetch thread list later if needed
+        }}
+      />
     </div>
   );
 }
