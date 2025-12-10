@@ -1,6 +1,6 @@
 // src/features/mail/types/mail.ts
 
-export type MailLabel = "INBOX" | "STARRED" | "SENT" | "DRAFTS";
+export type MailLabel = "INBOX" | "STARRED" | "SENT" | "DRAFTS" | "TRASH";
 
 export type MailItem = {
   id: string;
@@ -20,12 +20,16 @@ export type MailItem = {
   receivedAtFull: string;
 
   unread: boolean;
+
+  // Gmail-starred or not
+  isStarred: boolean;
 };
 
 export const MOCK_MAIL_ITEMS: MailItem[] = [
   {
     id: "1",
     label: "INBOX",
+    isStarred: true,
     from: "Lyra Hiring",
     fromEmail: "careers@lyra.com",
     subject: "Gmail task – next steps & expectations",
@@ -46,6 +50,7 @@ Lyra Hiring Team`,
   {
     id: "2",
     label: "INBOX",
+    isStarred: false,
     from: "Google",
     fromEmail: "no-reply@google.com",
     subject: "Security alert – new sign-in from Chrome on macOS",
@@ -67,6 +72,7 @@ Google Account Security`,
   {
     id: "3",
     label: "DRAFTS",
+    isStarred: false,
     from: "Jonathan Liu",
     fromEmail: "jonathanliu023@gmail.com",
     subject: "(Draft) Reply to Lyra",

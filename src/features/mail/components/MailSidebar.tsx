@@ -7,7 +7,7 @@ type MailSidebarProps = {
   activeLabel: MailLabel;
   unreadInboxCount: number;
   onLabelChange: (label: MailLabel) => void;
-  onCompose?: () => void; // 👈 added
+  onCompose?: () => void;
 };
 
 const LABELS: { id: MailLabel; name: string; icon: string }[] = [
@@ -15,6 +15,7 @@ const LABELS: { id: MailLabel; name: string; icon: string }[] = [
   { id: "STARRED", name: "Starred", icon: "star" },
   { id: "SENT", name: "Sent", icon: "send" },
   { id: "DRAFTS", name: "Drafts", icon: "drafts" },
+  { id: "TRASH", name: "Trash", icon: "delete" }, // 🗑️ new
 ];
 
 export function MailSidebar({

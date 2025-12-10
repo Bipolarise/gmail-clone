@@ -1,4 +1,3 @@
-// src/features/mail/components/MailList.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,11 +8,17 @@ type MailListProps = {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 
-  // OPTIONAL pagination props – safe if you don't pass them
-  page?: number;              // 1-based; default 1
-  pageSize?: number;          // default = emails.length (or 50)
-  total?: number;             // default = emails.length
+  page?: number;
+  pageSize?: number;
+  total?: number;
   onPageChange?: (page: number) => void;
+
+  // ⭐ now takes (id, nextStarred)
+  onToggleStar?: (id: string, nextStarred: boolean) => void;
+
+  // 🔄 refresh behaviour
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 };
 
 export function MailList({
@@ -24,11 +29,12 @@ export function MailList({
   pageSize,
   total,
   onPageChange,
+  onToggleStar,
+  onRefresh,
+  isRefreshing,
 }: MailListProps) {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(() => new Set());
-  const [starredIds, setStarredIds] = useState<Set<string>>(() => new Set());
 
-  // Make first render (SSR + initial client) deterministic
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
     setHasMounted(true);
@@ -36,14 +42,6 @@ export function MailList({
 
   const toggleChecked = (id: string) => {
     setCheckedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
-  const toggleStarred = (id: string) => {
-    setStarredIds((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
@@ -77,86 +75,6 @@ export function MailList({
   if (!hasMounted) {
     return (
       <section className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white pt-2 shadow-[0_1px_3px_rgba(60,64,67,0.2)]">
-        {/* Toolbar row above tabs */}
-        <div className="flex h-8 items-center justify-between px-4 text-[11px] text-slate-600">
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-md bg-transparent hover:bg-[#f1f3f4]"
-              aria-label="Select"
-            >
-              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
-                check_box_outline_blank
-              </span>
-            </button>
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
-              aria-label="Refresh"
-            >
-              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
-                refresh
-              </span>
-            </button>
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
-              aria-label="More"
-            >
-              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
-                more_vert
-              </span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-1 text-[12px]">
-            <span>Loading…</span>
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
-              aria-label="Previous page"
-              disabled
-            >
-              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
-                chevron_left
-              </span>
-            </button>
-            <button
-              type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
-              aria-label="Next page"
-              disabled
-            >
-              <span className="material-symbols-outlined !text-[20px] leading-none text-slate-500">
-                chevron_right
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Tabs row */}
-        <div className="flex h-14 items-end border-b border-[#e0e3e7] px-4 text-sm font-medium text-slate-600">
-          <button className="flex min-w-[200px] items-center gap-2 border-b-2 border-[#1a73e8] px-6 pb-3 text-[#1a73e8]">
-            <span className="material-symbols-outlined text-[18px] leading-none">
-              inbox
-            </span>
-            <span>Primary</span>
-          </button>
-          <button className="ml-1 flex min-w-[200px] items-center gap-2 border-b-2 border-transparent px-6 pb-3 text-slate-500 hover:text-slate-700">
-            <span className="material-symbols-outlined text-[18px] leading-none">
-              local_offer
-            </span>
-            <span>Promotions</span>
-          </button>
-          <button className="ml-1 flex min-w-[200px] items-center gap-2 border-b-2 border-transparent px-6 pb-3 text-slate-500 hover:text-slate-700">
-            <span className="material-symbols-outlined text-[18px] leading-none">
-              group
-            </span>
-            <span>Social</span>
-          </button>
-        </div>
-
-        {/* Loading body */}
         <div className="flex-1 flex items-center justify-center text-sm text-slate-500">
           Loading messages…
         </div>
@@ -170,6 +88,7 @@ export function MailList({
       {/* Toolbar row above tabs */}
       <div className="flex h-8 items-center justify-between px-4 text-[11px] text-slate-600">
         <div className="flex items-center gap-1.5">
+          {/* select checkbox icon (not wired to “select all” yet) */}
           <button
             type="button"
             className="flex h-7 w-7 items-center justify-center rounded-md bg-transparent hover:bg-[#f1f3f4]"
@@ -179,15 +98,30 @@ export function MailList({
               check_box_outline_blank
             </span>
           </button>
+
+          {/* 🔄 Refresh button */}
           <button
             type="button"
-            className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRefresh?.();
+            }}
+            disabled={isRefreshing}
+            className={`flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4] ${
+              isRefreshing ? "cursor-wait opacity-60" : ""
+            }`}
             aria-label="Refresh"
           >
-            <span className="material-symbols-outlined !text-[20px] leading-none text-slate-600">
+            <span
+              className={`material-symbols-outlined !text-[20px] leading-none text-slate-600 ${
+                isRefreshing ? "animate-spin" : ""
+              }`}
+            >
               refresh
             </span>
           </button>
+
+          {/* more (3-dot) button */}
           <button
             type="button"
             className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
@@ -264,7 +198,8 @@ export function MailList({
           const isSelected = mail.id === selectedId;
           const isUnread = mail.unread;
           const isChecked = checkedIds.has(mail.id);
-          const isStarred = starredIds.has(mail.id);
+          const isStarred = !!mail.isStarred;
+          const nextStarred = !isStarred;
 
           return (
             <div
@@ -289,12 +224,12 @@ export function MailList({
                   </span>
                 </button>
 
-                {/* ⭐ star toggle */}
+                {/* ⭐ star – clickable, passes id + nextStarred */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleStarred(mail.id);
+                    onToggleStar?.(mail.id, nextStarred);
                   }}
                   className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-[#f1f3f4]"
                 >

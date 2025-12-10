@@ -1,14 +1,12 @@
-// src/features/mail/components/MailComposeModal.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 
 type MailComposeModalProps = {
   open: boolean;
   onClose: () => void;
 
-  // optional for now – you can wire this to a tRPC mutation later
   onSend?: (payload: {
     to: string;
     cc?: string;
@@ -40,6 +38,18 @@ export function MailComposeModal({
   const [showBcc, setShowBcc] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
+  // 🔁 whenever we open with new initial values, reset the form
+  useEffect(() => {
+    if (!open) return;
+    setTo(initialTo);
+    setSubject(initialSubject);
+    setBody(initialBody);
+    setCc("");
+    setBcc("");
+    setShowCc(false);
+    setShowBcc(false);
+  }, [open, initialTo, initialSubject, initialBody]);
+
   if (!open) return null;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -54,6 +64,7 @@ export function MailComposeModal({
       setIsSending(false);
       onClose();
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Failed to send email", err);
       setIsSending(false);
     }
