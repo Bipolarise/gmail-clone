@@ -4,11 +4,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import type { Session } from "next-auth";
-import {
-  useSuspenseQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 
 import { MailSidebar } from "./MailSidebar";
 import { MailList } from "./MailList";
@@ -49,7 +45,6 @@ export function MailApp({ session }: MailAppProps) {
   const avatarInitial = primaryIdentity.charAt(0).toUpperCase();
 
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
 
   // ---------------- MUTATIONS ----------------
   const sendEmail = useMutation(
@@ -160,77 +155,31 @@ export function MailApp({ session }: MailAppProps) {
       to,
       subject,
       body: `\n\n${headerLine}`,
-      threadId: mail.id, // reply stays in same thread
+      threadId: mail.id,
     });
     setIsComposeOpen(true);
   };
 
-  // Helper to fetch the *last message* in a thread (HTML / text / from / date)
-  const fetchLastMessageContent = async (threadId: string) => {
-    try {
-      const opts = trpc.gmail.getThreadDetail.queryOptions({ threadId });
-      const res = await queryClient.fetchQuery(opts);
-
-      const conversation = res?.conversation ?? [];
-      const last = conversation[conversation.length - 1];
-
-      if (!last) {
-        return {
-          html: "",
-          text: "",
-          from: "",
-          date: "",
-        };
-      }
-
-      return {
-        html: last.html ?? "",
-        text: last.text ?? "",
-        from: last.from ?? "",
-        date: last.date ?? "",
-      };
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to fetch last message for forward:", err);
-      return { html: "", text: "", from: "", date: "" };
-    }
-  };
-
-  const openForwardCompose = async (mail: MailItem) => {
+  const openForwardCompose = (mail: MailItem) => {
     const subject = mail.subject.startsWith("Fwd:")
       ? mail.subject
       : `Fwd: ${mail.subject}`;
 
-    // 1. Fetch last message content for this thread
-    const last = await fetchLastMessageContent(mail.id);
-
-    // 2. Build Gmail-style forwarded header
     const header = [
       "---------- Forwarded message ----------",
-      `From: ${last.from || mail.from}${
+      `From: ${mail.from}${
         mail.fromEmail ? ` <${mail.fromEmail}>` : ""
       }`,
-      `Date: ${last.date || mail.receivedAtFull}`,
+      `Date: ${mail.receivedAtFull}`,
       `Subject: ${mail.subject}`,
       "",
     ].join("\n");
 
-    // 3. Append message body (HTML or text)
-    let body = `\n\n${header}`;
-    if (last.html) {
-      body += last.html;
-    } else if (last.text) {
-      body += last.text;
-    } else {
-      body += mail.snippet || "(no content)";
-    }
-
     setComposeInitial({
       to: "",
       subject,
-      body,
-      // Forward should usually start a *new* conversation, so omit threadId
-      threadId: undefined,
+      body: `\n\n${header}`,
+      threadId: mail.id,
     });
     setIsComposeOpen(true);
   };
@@ -249,7 +198,6 @@ export function MailApp({ session }: MailAppProps) {
         starred: nextStarred,
       });
     } catch {
-      // revert on error
       setMailItems((prev) =>
         prev.map((m) =>
           m.id === id ? { ...m, isStarred: !nextStarred } : m,
@@ -431,7 +379,7 @@ export function MailApp({ session }: MailAppProps) {
           });
           setIsComposeOpen(false);
           setComposeInitial(null);
-          await refetch(); // so reply/forward shows up in the list
+          await refetch(); // so reply/forward shows up in the thread list
         }}
       />
     </div>
