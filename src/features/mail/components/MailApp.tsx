@@ -40,8 +40,7 @@ function resolveLabel(labelIds: string[]): MailLabel {
 }
 
 export function MailApp({ session }: MailAppProps) {
-  const primaryIdentity =
-    session.user?.email ?? session.user?.name ?? "You";
+  const primaryIdentity = session.user?.email ?? session.user?.name ?? "You";
   const avatarInitial = primaryIdentity.charAt(0).toUpperCase();
 
   const trpc = useTRPC();
@@ -77,27 +76,36 @@ export function MailApp({ session }: MailAppProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [page, setPage] = useState(1);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
-  const [composeInitial, setComposeInitial] =
-    useState<ComposeInitial | null>(null);
+  const [composeInitial, setComposeInitial] = useState<ComposeInitial | null>(
+    null,
+  );
 
   const [mailItems, setMailItems] = useState<MailItem[]>([]);
+
+  // ✅ Manual refresh spinner state (only spins when user clicks Refresh)
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   // ---------------- FETCH THREADS ----------------
   const threadsQuery = useSuspenseQuery(
     trpc.gmail.listThreads.queryOptions(undefined, {
       enabled: !!session.user,
       staleTime: 30_000,
+      // Optional: avoids background refetch on window focus (tutor-friendly)
+      // refetchOnWindowFocus: false,
     }),
   );
 
-  const {
-    data: threads = [],
-    refetch,
-    isFetching,
-    isRefetching,
-  } = threadsQuery;
+  const { data: threads = [], refetch } = threadsQuery;
 
-  const isRefreshing = isFetching || isRefetching;
+  // ✅ This is what your refresh button should call
+  const handleManualRefresh = async () => {
+    setIsManualRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsManualRefreshing(false);
+    }
+  };
 
   // ---------------- MAP THREADS → MAIL ITEMS ----------------
   useEffect(() => {
@@ -143,9 +151,7 @@ export function MailApp({ session }: MailAppProps) {
   // ---------------- REPLY / FORWARD HELPERS ----------------
   const openReplyCompose = (mail: MailItem) => {
     const to = mail.fromEmail || mail.from;
-    const subject = mail.subject.startsWith("Re:")
-      ? mail.subject
-      : `Re: ${mail.subject}`;
+    const subject = mail.subject.startsWith("Re:") ? mail.subject : `Re: ${mail.subject}`;
 
     const headerLine = `On ${mail.receivedAtFull}, ${
       mail.fromEmail || mail.from
@@ -155,21 +161,17 @@ export function MailApp({ session }: MailAppProps) {
       to,
       subject,
       body: `\n\n${headerLine}`,
-      threadId: mail.id,
+      threadId: mail.id, // reply stays in same thread
     });
     setIsComposeOpen(true);
   };
 
   const openForwardCompose = (mail: MailItem) => {
-    const subject = mail.subject.startsWith("Fwd:")
-      ? mail.subject
-      : `Fwd: ${mail.subject}`;
+    const subject = mail.subject.startsWith("Fwd:") ? mail.subject : `Fwd: ${mail.subject}`;
 
     const header = [
       "---------- Forwarded message ----------",
-      `From: ${mail.from}${
-        mail.fromEmail ? ` <${mail.fromEmail}>` : ""
-      }`,
+      `From: ${mail.from}${mail.fromEmail ? ` <${mail.fromEmail}>` : ""}`,
       `Date: ${mail.receivedAtFull}`,
       `Subject: ${mail.subject}`,
       "",
@@ -179,7 +181,8 @@ export function MailApp({ session }: MailAppProps) {
       to: "",
       subject,
       body: `\n\n${header}`,
-      threadId: mail.id,
+      // ✅ Forward should start a NEW thread (do NOT attach threadId)
+      threadId: undefined,
     });
     setIsComposeOpen(true);
   };
@@ -187,9 +190,7 @@ export function MailApp({ session }: MailAppProps) {
   // ---------------- TOGGLE STAR HANDLER ----------------
   const handleToggleStar = async (id: string, nextStarred: boolean) => {
     setMailItems((prev) =>
-      prev.map((m) =>
-        m.id === id ? { ...m, isStarred: nextStarred } : m,
-      ),
+      prev.map((m) => (m.id === id ? { ...m, isStarred: nextStarred } : m)),
     );
 
     try {
@@ -199,9 +200,7 @@ export function MailApp({ session }: MailAppProps) {
       });
     } catch {
       setMailItems((prev) =>
-        prev.map((m) =>
-          m.id === id ? { ...m, isStarred: !nextStarred } : m,
-        ),
+        prev.map((m) => (m.id === id ? { ...m, isStarred: !nextStarred } : m)),
       );
     }
   };
@@ -250,12 +249,10 @@ export function MailApp({ session }: MailAppProps) {
     (currentPage - 1) * PAGE_SIZE + PAGE_SIZE,
   );
 
-  const selectedMail =
-    filteredEmails.find((m) => m.id === selectedId) ?? null;
+  const selectedMail = filteredEmails.find((m) => m.id === selectedId) ?? null;
 
   const unreadInboxCount = useMemo(
-    () =>
-      mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
+    () => mailItems.filter((m) => m.label === "INBOX" && m.unread).length,
     [mailItems],
   );
 
@@ -323,7 +320,7 @@ export function MailApp({ session }: MailAppProps) {
             />
           )}
 
-          <div className="flex flex-1 overflow-hidden px-4 pt-3 pb-4">
+          <div className="flex flex-1 overflow-hidden px-4 pb-4 pt-3">
             {viewMode === "list" && (
               <MailList
                 emails={pagedEmails}
@@ -341,8 +338,9 @@ export function MailApp({ session }: MailAppProps) {
                   setViewMode("list");
                 }}
                 onToggleStar={handleToggleStar}
-                onRefresh={() => refetch()}
-                isRefreshing={isRefreshing}
+                // ✅ fixed: refresh spinner only reflects button click
+                onRefresh={handleManualRefresh}
+                isRefreshing={isManualRefreshing}
               />
             )}
 
@@ -350,12 +348,8 @@ export function MailApp({ session }: MailAppProps) {
               <MailDetail
                 email={selectedMail}
                 onBack={() => setViewMode("list")}
-                onReply={() =>
-                  selectedMail && openReplyCompose(selectedMail)
-                }
-                onForward={() =>
-                  selectedMail && openForwardCompose(selectedMail)
-                }
+                onReply={() => selectedMail && openReplyCompose(selectedMail)}
+                onForward={() => selectedMail && openForwardCompose(selectedMail)}
               />
             )}
           </div>
@@ -375,11 +369,11 @@ export function MailApp({ session }: MailAppProps) {
         onSend={async (payload) => {
           await sendEmail.mutateAsync({
             ...payload,
-            threadId: composeInitial?.threadId,
+            threadId: composeInitial?.threadId, // reply keeps threadId; forward is undefined
           });
           setIsComposeOpen(false);
           setComposeInitial(null);
-          await refetch(); // so reply/forward shows up in the thread list
+          await refetch(); // list updates after sending
         }}
       />
     </div>

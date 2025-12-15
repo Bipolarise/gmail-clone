@@ -1,3 +1,24 @@
 {
-  "pages": {}
+  "pages": {
+    "/(home)/page": [
+      "static/chunks/[root-of-the-server]__698e6b9e._.css",
+      "static/chunks/0e117_@tanstack_query-devtools_build_16bcc5dc._.js",
+      "static/chunks/node_modules__pnpm_ab4e1554._.js",
+      "static/chunks/src_trpc_c5525986._.js",
+      "static/chunks/src_app_layout_tsx_898895b0._.js",
+      "static/chunks/5fb3a_next_dist_client_components_builtin_global-error_6652887e.js",
+      "static/chunks/src_features_mail_components_5c319060._.js",
+      "static/chunks/node_modules__pnpm_db177355._.js",
+      "static/chunks/src_app_(home)_page_tsx_6652887e._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_4312890a._.js",
+      "static/chunks/5fb3a_next_dist_compiled_react-dom_5d9fb13d._.js",
+      "static/chunks/5fb3a_next_dist_compiled_next-devtools_index_a7246990.js",
+      "static/chunks/5fb3a_next_dist_compiled_06f0028e._.js",
+      "static/chunks/5fb3a_next_dist_client_5066a875._.js",
+      "static/chunks/5fb3a_next_dist_f611c254._.js",
+      "static/chunks/61dca_@swc_helpers_cjs_28edb73c._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_7213cf9d._.js"
+    ]
+  }
 }
