@@ -82,7 +82,6 @@ export function MailApp({ session }: MailAppProps) {
 
   const [mailItems, setMailItems] = useState<MailItem[]>([]);
 
-  // ✅ Manual refresh spinner state (only spins when user clicks Refresh)
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   // ---------------- FETCH THREADS ----------------
@@ -97,7 +96,6 @@ export function MailApp({ session }: MailAppProps) {
 
   const { data: threads = [], refetch } = threadsQuery;
 
-  // ✅ This is what your refresh button should call
   const handleManualRefresh = async () => {
     setIsManualRefreshing(true);
     try {
@@ -338,7 +336,6 @@ export function MailApp({ session }: MailAppProps) {
                   setViewMode("list");
                 }}
                 onToggleStar={handleToggleStar}
-                // ✅ fixed: refresh spinner only reflects button click
                 onRefresh={handleManualRefresh}
                 isRefreshing={isManualRefreshing}
               />
